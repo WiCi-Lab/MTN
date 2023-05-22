@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed May 12 10:14:45 2021
+Created on Fri May 19 22:38:05 2023
 
-@author: 5106
+@author: WiCi
 """
 
 
@@ -20,11 +20,8 @@ import torch.utils.data as Data
 import matplotlib.pyplot as plt
 from einops.layers.torch import Rearrange
 from einops import rearrange
-from MTN import channel_est
-# from model_UNet import channel_est
-from benchmarks import MDSR
-from DRSN import MTLModel
-
+# from model_MLP1 import channel_est
+from benchmarks import LasSRN
 
 #
 #train_set = Data.TensorDataset(X_train, y_train) 
@@ -108,28 +105,28 @@ def criterion(y_pred, y_true, log_vars):
 #train_data = TrainData(feature_num, X, Y1, Y2)
 #train_data_loader = DataLoader(train_data, shuffle=True, batch_size=batch_size)
 
-model = MDSR().to(device)
+model = LasSRN().to(device)
 # model_path = "model/MMOE_model_P1_epoch_19.pth"
 # model = torch.load(model_path).to(device) 
 
 # # model_path = "MTL_model1_epoch100.pth"
 # # model = torch.load(model_path).to(device) 
 
-from thop import profile
-inputest1 = torch.randn(1, 2, 32, 16).cuda()
-# inputest2 = torch.randn(1, 2, 64, 4).cuda()
+# from thop import profile
+# inputest1 = torch.randn(1, 2, 32, 16).cuda()
+# # inputest2 = torch.randn(1, 2, 64, 4).cuda()
 
-flops, params = profile(model, inputs=(inputest1,))
+# flops, params = profile(model, inputs=(inputest1,))
 
-from thop import clever_format
-flops, params = clever_format([flops, params], "%.3f")
-print('flops: ', flops, 'params: ', params)
+# from thop import clever_format
+# flops, params = clever_format([flops, params], "%.3f")
+# print('flops: ', flops, 'params: ', params)
 
 
 class MyDataset(Dataset):
     def __init__(self):
         
-        path="inHmix_28_32_128_K2_16pilot.mat"
+        path="inHmix_28_32_128_S_32pilot.mat"
         with h5py.File(path, 'r') as file:
             train_h1 = np.transpose(np.array(file['output_da1']))
             train_h1 = train_h1.transpose([0,3,1,2])
@@ -150,7 +147,7 @@ class MyDataset(Dataset):
             
         #    test_snr = np.transpose(np.array(file['Testsnr']))
         with h5py.File(path, 'r') as file:
-            train_y1 = np.transpose(np.array(file['input_da']))
+            train_y1 = np.transpose(np.array(file['input_da1']))
             train_y1 = train_y1.transpose([0,3,1,2])
         
         self.X = train_y1.astype(np.float32)
@@ -173,7 +170,7 @@ class MyDataset(Dataset):
 class MyDataset1(Dataset):
     def __init__(self):
         
-        path="inHmix_28_32_128_test_K2_16pilot.mat"
+        path="inHmix_28_32_128_test_S_32pilot.mat"
         with h5py.File(path, 'r') as file:
             train_h1 = np.transpose(np.array(file['Hd1']))
             train_h1 = train_h1.transpose([0,3,1,2])
@@ -190,7 +187,7 @@ class MyDataset1(Dataset):
             
         #    test_snr = np.transpose(np.array(file['Testsnr']))
         with h5py.File(path, 'r') as file:
-            train_y1 = np.transpose(np.array(file['Yd']))
+            train_y1 = np.transpose(np.array(file['Yd1']))
             train_y1 = train_y1.transpose([0,3,1,2])
         
         self.X = train_y1.astype(np.float32)
@@ -274,7 +271,7 @@ for it in range(epochs):
     # for iteration, minibatch in enumerate(minibatches, 1):
         XE, YE1, YE2= x.to(device), y1.to(device), y2.to(device)
         
-        Yhat1, Yhat2 = model(XE)
+        Yhat1 = model(XE)
 #        Yhat1_view = Yhat1.view(-1,w1,e1,r1)
 #        Yhat2_view = Yhat2.view(-1,w3,e3,r3)
 #        
@@ -284,11 +281,12 @@ for it in range(epochs):
 #        plt.imshow(YE1[1,0,:,:].cpu().detach().numpy(),cmap='gray')
 #        plt.imshow(YE2[1,0,:,:].cpu().detach().numpy(),cmap='gray')
         
-        l1 = 1*loss_func(Yhat1, YE1)    
-        l2 = 1*loss_func(Yhat2, YE2)
+        l1 = loss_func(Yhat1, YE1)
+        loss = l1
+        # l2 = loss_func(Yhat2, YE2)
         # loss =  (0.6*l1 + 1.4*l2)/2
-        awl = AutomaticWeightedLoss(2)
-        loss = awl(l1, l2)
+        # awl = AutomaticWeightedLoss(2)
+        # loss = awl(l1, l2)
         # inputX = [XE]
         # outputY = [YE1, YE2]
         # loss, log_vars = mtl(inputX, outputY)
@@ -320,7 +318,7 @@ for it in range(epochs):
         for i, (x, y1,y2) in enumerate(test_loader):
             XE, YE1, YE2 = x.to(device), y1.to(device), y2.to(device)
             
-            Yhat1, Yhat2 = model(XE)
+            Yhat1 = model(XE)
             
     #        Yhat1_view = Yhat1.view(-1,w1,e1,r1)
     #        Yhat2_view = Yhat2.view(-1,w3,e3,r3)
@@ -332,8 +330,8 @@ for it in range(epochs):
     #        plt.imshow(YE2[1,0,:,:].cpu().detach().numpy(),cmap='gray')
             
             l1 = loss_func(Yhat1, YE1)    
-            l2 = loss_func(Yhat2, YE2)
-            loss =  (l1 + l2)/2
+            # l2 = loss_func(Yhat2, YE2)
+            loss =  l1
             # inputX = [XE]
             # outputY = [YE1, YE2]
             # loss, log_vars = mtl(inputX, outputY)
@@ -343,21 +341,21 @@ for it in range(epochs):
             epoch_cost = epoch_cost + (loss / test_BATCH_SIZE)
             
             epoch_cost1 = epoch_cost1 + (l1 / test_BATCH_SIZE)
-            epoch_cost2 = epoch_cost2 + (l2 / test_BATCH_SIZE)
+            # epoch_cost2 = epoch_cost2 + (l2 / test_BATCH_SIZE)
             nmsei1=np.zeros([YE1.shape[0], 1])
             nmsei2=np.zeros([YE1.shape[0], 1])
             for i1 in range(YE1.shape[0]):
                 nmsei1[i1] = np.sum(np.square(np.abs(Yhat1[i1,:].cpu().detach().numpy()-YE1[i1,:].cpu().detach().numpy()))) / np.sum(np.square(np.abs(YE1[i1,:].cpu().detach().numpy())))
-                nmsei2[i1] = np.sum(np.square(np.abs(Yhat2[i1,:].cpu().detach().numpy()-YE2[i1,:].cpu().detach().numpy()))) / np.sum(np.square(np.abs(YE2[i1,:].cpu().detach().numpy())))
+                # nmsei2[i1] = np.sum(np.square(np.abs(Yhat2[i1,:].cpu().detach().numpy()-YE2[i1,:].cpu().detach().numpy()))) / np.sum(np.square(np.abs(YE2[i1,:].cpu().detach().numpy())))
                 
             tr_nmse1.append(np.mean(nmsei1))
-            tr_nmse2.append(np.mean(nmsei2))
+            # tr_nmse2.append(np.mean(nmsei2))
             
         nm1.append(np.mean(tr_nmse1))
-        nm2.append(np.mean(tr_nmse2))
+        # nm2.append(np.mean(tr_nmse2))
         cost1D.append(torch.mean(epoch_cost1))
-        cost2D.append(torch.mean(epoch_cost2))
-        costD.append(torch.mean(epoch_cost)) 
+        # cost2D.append(torch.mean(epoch_cost2))
+        # costD.append(torch.mean(epoch_cost)) 
 #        
         # Yhat1D, Yhat2D = model(X_valid1.to(device))
         # Y1_valid,Y2_valid= Y1_valid.to(device),Y2_valid.to(device)
@@ -379,10 +377,10 @@ for it in range(epochs):
         # nm1.append(tr_nmse1)
         # nm2.append(tr_nmse2)
         print('Iter-{}; NMSE_R1: {:.4}'.format(it, 10*np.log10(np.mean(tr_nmse1))))
-        print('Iter-{}; NMSE_R2: {:.4}'.format(it, 10*np.log10(np.mean(tr_nmse2))))
+        # print('Iter-{}; NMSE_R2: {:.4}'.format(it, 10*np.log10(np.mean(tr_nmse2))))
         
         if (it+1) % 10 == 0:
-            net_g_model_out_path = "model/DRSN_model_K2_P8_epoch_{}.pth".format(it)
+            net_g_model_out_path = "model/U-MLP_Smodel_cK1_P4_epoch_{}.pth".format(it)
             torch.save(model, net_g_model_out_path)
 
 # plt.plot(torch.tensor(costtr, device = 'cpu'),'-r',label='Tarining')
@@ -410,20 +408,21 @@ for it in range(epochs):
 # sio.savemat('MTL_testcost1.mat', {'a':torch.tensor(cost1D, device = 'cpu')})
 # sio.savemat('MTL_testcost2.mat', {'a':torch.tensor(cost2D, device = 'cpu')})
 
-# model_path = "model/U-MLP_model_K2_P4_epoch_49.pth"
+# model_path = "model/MMOE_model_K4_P1_epoch_99.pth"
 # model = torch.load(model_path).to(device) 
 
-# model_path = "model/MMOE_model_K4_P8_epoch_{}.pth"
+# model_path = "model/U-MLP_model_cK1_P4_epoch_49.pth"
+# model = torch.load(model_path).to(device) 
 # torch.save(model, model_path)
 
 # import os
 # os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
-# test_BATCH_SIZE=100
-# test_dataset = MyDataset1()
-# test_loader = DataLoader(dataset=test_dataset,
-#                             batch_size=test_BATCH_SIZE,
-#                             shuffle=False,drop_last=True)  # shuffle 标识要打乱顺序
+test_BATCH_SIZE=100
+test_dataset = MyDataset1()
+test_loader = DataLoader(dataset=test_dataset,
+                            batch_size=test_BATCH_SIZE,
+                            shuffle=False,drop_last=True)  # shuffle 标识要打乱顺序
 
 # model.eval()
 # #Yhat1D,Yhat2D = model(X1_valid.to(device),X2_valid.to(device))
@@ -443,15 +442,15 @@ with torch.no_grad():
     for i, (x, y1,y2) in enumerate(test_loader):
         XE, YE1, YE2= x.to(device), y1.to(device), y2.to(device)
         
-        Yhat1, Yhat2 = model(XE)
+        Yhat1 = model(XE)
         
         nmsei1=np.zeros([YE1.shape[0], 1])
-        nmsei2=np.zeros([YE1.shape[0], 1])
+        # nmsei2=np.zeros([YE1.shape[0], 1])
         for i1 in range(YE1.shape[0]):
             nmsei1[i1] = np.sum(np.square(np.abs(Yhat1[i1,:].cpu().detach().numpy()-YE1[i1,:].cpu().detach().numpy()))) / np.sum(np.square(np.abs(YE1[i1,:].cpu().detach().numpy())))
-            nmsei2[i1] = np.sum(np.square(np.abs(Yhat2[i1,:].cpu().detach().numpy()-YE2[i1,:].cpu().detach().numpy()))) / np.sum(np.square(np.abs(YE2[i1,:].cpu().detach().numpy())))
+            # nmsei2[i1] = np.sum(np.square(np.abs(Yhat2[i1,:].cpu().detach().numpy()-YE2[i1,:].cpu().detach().numpy()))) / np.sum(np.square(np.abs(YE2[i1,:].cpu().detach().numpy())))
         nmse1 =np.mean(nmsei1)
-        nmse2 =np.mean(nmsei2)
+        # nmse2 =np.mean(nmsei2)
         
         
         # nmse1 = NMSE(YE1.cpu().detach().numpy(), Yhat1.cpu().detach().numpy())
@@ -460,15 +459,15 @@ with torch.no_grad():
         # nmse4 = NMSE(YE4.cpu().detach().numpy(), Yhat4.cpu().detach().numpy())
         
         test1_nmse.append(nmse1)
-        test2_nmse.append(nmse2)
+        # test2_nmse.append(nmse2)
         if (i+1)%10==0:
             nmse1_snr.append(np.mean(test1_nmse))
-            nmse2_snr.append(np.mean(test2_nmse))
+            # nmse2_snr.append(np.mean(test2_nmse))
             test1_nmse=[]
-            test2_nmse=[]
+            # test2_nmse=[]
 
 nmse1_db=10*np.log10(nmse1_snr)
-nmse2_db=10*np.log10(nmse2_snr)
+# nmse2_db=10*np.log10(nmse2_snr)
 
 # nmse1_db=10*np.log10(np.mean(nmse1_snr))
 # nmse2_db=10*np.log10(np.mean(nmse2_snr))
@@ -487,7 +486,7 @@ HNMSE=[]
 
 
 plt.plot(snrs, nmse1_db,ls='-', marker='+', c='black',label='R1')
-plt.plot(snrs, nmse2_db,ls='--', marker='o', c='black',label='R2')
+# plt.plot(snrs, nmse2_db,ls='--', marker='o', c='black',label='R2')
 plt.legend()
 #plt.plot(pilots, nmse1_db)
 plt.grid(True) 
@@ -497,8 +496,8 @@ plt.show()
 
 
 import scipy.io as sio # mat
-sio.savemat('DRSN_H4.mat', {'a':nmse1_db})
-sio.savemat('DRSN_H4.mat', {'a':nmse2_db})
+# sio.savemat('sMLPT1_P4.mat', {'a':nmse1_db})
+sio.savemat('EDSR_RP4.mat', {'a':nmse1_db})
 
 # MT = np.load('MT_testcost.npy',allow_pickle=True)
 # MTCNN= np.load('MTCNN_testcost.npy',allow_pickle=True)

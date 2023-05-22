@@ -180,13 +180,10 @@ class up_conv(nn.Module):
     def __init__(self, in_ch, out_ch):
         super(up_conv, self).__init__()
         self.up = nn.Sequential(
-#            nn.ConvTranspose2d(in_ch , out_ch, kernel_size=3, stride=2, padding=1,bias=True),
-            nn.Upsample(scale_factor=(1,2),mode='nearest'),
+            nn.Upsample(scale_factor=(1,2),mode='bicubic',align_corners=True),
             nn.Conv2d(in_ch, out_ch, kernel_size=3, stride=1, padding=1, bias=True),
-            # nn.InstanceNorm2d(out_ch),
             nn.BatchNorm2d(out_ch),
-            # nn.LeakyReLU(negative_slope=0.3)
-            # nn.PReLU()
+            nn.LeakyReLU(negative_slope=0.3)
         )
 
     def forward(self, x):
@@ -591,7 +588,7 @@ class FeatureExtraction(nn.Module):
         #     )
             
         m_tail = [
-            up_conv(96, 96) for _ in range(3)
+            up_conv(96, 96) for _ in range(2)
         ]
         # self.add_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std, 1)
 
@@ -674,4 +671,46 @@ class LasSRN(nn.Module):
         convt_F1 = self.FeatureExtraction1(LR)
 #        print(convt_F1.size())
         
-        return convt_F1    
+        return convt_F1
+
+class MDSR(nn.Module):
+    def __init__(self):
+        super(MDSR, self).__init__()
+
+        self.conv0 = nn.Conv2d(2, 96, (3, 3), (1, 1), padding=1)
+        self.conv51 = nn.Conv2d(96, 2, (3, 3), (1, 1), (1, 1))
+        self.conv52 = nn.Conv2d(96, 2, (3, 3), (1, 1), (1, 1))
+
+        self.LReLus = nn.ReLU()
+        m_body = [
+            _Res_Block() for _ in range(7)
+        ]
+            
+        m_tail1 = [
+            up_conv(96, 96) for _ in range(3)
+        ]
+        
+        m_tail2 = [
+            up_conv(96, 96) for _ in range(3)
+        ]
+
+        self.body = nn.Sequential(*m_body)
+        # self.tail = nn.Sequential(*m_tail)
+        
+        self.tail1 = nn.Sequential(*m_tail1)
+        self.tail2 = nn.Sequential(*m_tail2)
+       
+    def forward(self, x):
+#        print(x.size())
+        out = self.conv0(x)
+
+        
+        out = self.body(out) # 256 x 24 x 4
+        out1 = self.tail1(out)
+        out2 = self.tail2(out)
+        
+        out1 = self.conv51(out1)
+        out2 = self.conv52(out2)
+        
+        return out1,out2
+        

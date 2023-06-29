@@ -18,11 +18,9 @@ You can download the dataset and put it in the desired folder. The “inHmix_28_
 
 In the training and validation dataset generation, a common set of XL-RIS links is used for cascaded channel samples. However, in the test dataset, we replace a new set of XL-RIS links for each sample realization, which supports the network generalization in the test stage.
 
-2.The Training and Testing of U-MLP model
+### 2. Training and Testing of LPAN/LPAN-L model
 
 We have provided the model training and test code to reproduce the corresponding results. Specifically, you can run the “main_UMLP.py” file to train the channel estimation network, and then run the “test_UMLP.py” to realize the cascaded channel estimation under different SNR conditions. The detailed network architecture is given in the “model_UMLP.py”.
-
-### 2.The Training and Testing of LPAN/LPAN-L model
 
 We have integrated the model training and test code, and you can run the “main.py” file to obtain the channel estimation result of the LPAN or LPAN-L model. The detailed network model is given in the “LPAN.py” and “LPAN-L.py”.
 

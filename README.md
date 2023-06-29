@@ -20,7 +20,9 @@ In the training and validation dataset generation, a common set of XL-RIS links 
 
 ### 2. Training and Testing of LPAN/LPAN-L model
 
-We have provided the model training and test code to reproduce the corresponding results. Specifically, you can run the “main_UMLP.py” file to train the channel estimation network, and then run the “test_UMLP.py” to realize the cascaded channel estimation under different SNR conditions. The detailed network architecture is given in the “model_UMLP.py”.
+We have provided the model training and test code to reproduce the corresponding results of this submitted paper. The deatailed description of each script is listed as follows.
+
+Specifically, you can run the “main_UMLP.py” file to train the channel estimation network, and then run the “test_UMLP.py” to realize the cascaded channel estimation under different SNR conditions. The detailed network architecture is given in the “model_UMLP.py”.
 
 We have integrated the model training and test code, and you can run the “main.py” file to obtain the channel estimation result of the LPAN or LPAN-L model. The detailed network model is given in the “LPAN.py” and “LPAN-L.py”.
 

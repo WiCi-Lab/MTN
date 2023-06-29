@@ -12,12 +12,9 @@ In the following link, we have provided the paired samples for hybrid-field casc
 [DOI Link: https://dx.doi.org/10.21227/3c2t-dz81
 ](https://ieee-dataport.org/documents/star-risce)
 
-The simulation parameters of this dataset have been elaborated in our submitted paper. 
-descriptions: 
+The simulation parameters of this dataset have been elaborated in our submitted paper. For instance, M_1 x M_2 = 4 x 8, N_1 x N_2 = 4 x 32, f_c = 73GHz, and Q=N/4.
 
-we have provided the download links and descriptions of paired samples for cascaded channel estimation in XL-RIS systems, where the data preprocessing and normalization operations have been completed.
-
-You can download the dataset and put it in the desired folder. The “inHmix_73_32_512__4users_64pilot.mat” file and “inHmixLS_73_32_512_4users_32pilot.mat” file include the training and validation dataset, in which the LS pre-estimation is used in "inHmixLS_73_32_512_4users_32pilot.mat" file. The “inHmix_73_32_512_test4users_32pilot.mat” file, “inHmix_73_32_512_test4users_64pilot.mat”, and “inHmix_73_32_512_4users_128pilot.mat” file are the testing dataset, whose pilot overhead are set to 32, 64 and 128, respectively.
+You can download the dataset and put it in the desired folder. The “inHmix_28_32_128_K2_32pilot.mat” file collect the training dataset and validation dataset, while the “inHmix_28_32_128_test_K2_32pilot.mat” file is the testing dataset, whose pilot overhead are set to 32, 64 and 128, respectively.
 
 In the training and validation dataset generation, a common set of XL-RIS links is used for cascaded channel samples. However, in the test dataset, we replace a new set of XL-RIS links for each sample realization, which supports the network generalization in the test stage.
 

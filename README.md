@@ -8,9 +8,12 @@ How to use this simulation code package?
 
 ### 1.Data Generation and Download
 
-We have provided the paired samples in the following link.
+In the following link, we have provided the paired samples for hybrid-field cascaded channel estimation in STAR-RIS systems, in which the data preprocessing and normalization operations have been completed.
 [DOI Link: https://dx.doi.org/10.21227/3c2t-dz81
 ](https://ieee-dataport.org/documents/star-risce)
+
+The simulation parameters of this dataset have been elaborated in our submitted paper. 
+descriptions: 
 
 we have provided the download links and descriptions of paired samples for cascaded channel estimation in XL-RIS systems, where the data preprocessing and normalization operations have been completed.
 

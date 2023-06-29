@@ -18,7 +18,7 @@ You can download the dataset and put it in the desired folder. The “LS_64_256R
 
 We have integrated the model training and test code, and you can run the “main.py” file to obtain the channel estimation result of the LPAN or LPAN-L model. The detailed network model is given in the “LPAN.py” and “LPAN-L.py”.
 
-Notes: 
+## Notes 
 
 (1)	Please confirm the required library files have been installed.
 
@@ -29,6 +29,8 @@ Notes:
 The author in charge of this simulation code pacakge is: Jian Xiao (email: jianx@mails.ccnu.edu.cn). If you have any queries, please don’t hesitate to contact me.
 
 Copyright reserved by the WiCi Lab, Department of Electronics and Information Engineering, Central China Normal University, Wuhan 430079, China.
+
+## acknowledgements
 
 # 
 A preliminary version has been uploaded, while the clean code and the related instruction will be updated soon. We have provided the paired samples in the following link.

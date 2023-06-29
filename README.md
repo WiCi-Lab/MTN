@@ -6,7 +6,7 @@ This work has been submitted for possible publication. We highly respect reprodu
 ## Usage
 How to use this simulation code package?
 
-1.Data Generation and Download
+### 1.Data Generation and Download
 
 We have provided the paired samples in the following link.
 [DOI Link: https://dx.doi.org/10.21227/3c2t-dz81
@@ -14,7 +14,7 @@ We have provided the paired samples in the following link.
 
 You can download the dataset and put it in the desired folder. The “LS_64_256R_6users_32pilot.mat” file includes the training and validation dataset, while the “LS_64_256R_test_6users_32pilot” file is used in the test phase.
 
-2.The Training and Testing of LPAN/LPAN-L model
+### 2.The Training and Testing of LPAN/LPAN-L model
 
 We have integrated the model training and test code, and you can run the “main.py” file to obtain the channel estimation result of the LPAN or LPAN-L model. The detailed network model is given in the “LPAN.py” and “LPAN-L.py”.
 
@@ -30,9 +30,9 @@ The author in charge of this simulation code pacakge is: Jian Xiao (email: jianx
 
 Copyright reserved by the WiCi Lab, Department of Electronics and Information Engineering, Central China Normal University, Wuhan 430079, China.
 
-## acknowledgements
+## Acknowledgements
 
-# 
+## Preliminary version
 A preliminary version has been uploaded, while the clean code and the related instruction will be updated soon. We have provided the paired samples in the following link.
 
 [DOI Link: https://dx.doi.org/10.21227/3c2t-dz81

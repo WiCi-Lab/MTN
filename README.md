@@ -24,16 +24,13 @@ We have provided the model training and test code to reproduce the corresponding
 
 main.py: the main function of the MTN model.<br/>
 main_STN.py: the main function of the STN model.<br/>
+MTN.py: the proposed multi-task network architecture.<br/>
+STN.py: the proposed single-task network architecture.<br/>
+MDSR.py: a baseline network architecture based on the MDSR model.<br/>
+DRSN.py: a baseline network architecture based on the DRSN model.<br/>
+Benchmarks.py: A preliminary version based on the Transformer model.<br/>
 
-MTN.py:
-
-MDSR.py: a baseline network architecture based on the MDSR.
-DRSN.py: a baseline network architecture based on the DRSN.
-
-
-Specifically, you can run the “main_UMLP.py” file to train the channel estimation network, and then run the “test_UMLP.py” to realize the cascaded channel estimation under different SNR conditions. The detailed network architecture is given in the “model_UMLP.py”.
-
-We have integrated the model training and test code, and you can run the “main.py” file to obtain the channel estimation result of the LPAN or LPAN-L model. The detailed network model is given in the “LPAN.py” and “LPAN-L.py”.
+Specifically, you can run the “main.py” or "main_STN.py" file to train the hybrid-field cascaded channel estimation network, and then test the channel estimation performance under different SNR conditions, in which the model training and test code have been integrated into the main function. To enhance the readability of the provided scripts, We also have added the necessary code annotation.
 
 ## Notes 
 

@@ -40,8 +40,6 @@ Specifically, you can run the “main.py” or "main_STN.py" file to train the h
 
 (2)	Please switch the desired data loading path and network models.
 
-(3)	In this work, our goal is to propose a general multi-scale channel estimation network backbone for RIS-aided communication systems. In the model training phase, we did not carefully find the optimal hyper-parameters. Intuitively, hyper-parameters can be further optimized to obtain better channel estimation performance gain, e.g., the training batchsize, epochs, and the depth and width of neural network.
-
 (3) In the training stage, the different hyper-parameters setup will result in slight difference for final channel estimation perfromance. According to our training experiences and some carried attempts, the hyper-parameters and network architecture can be further optimized to obtain better channel estimation performance gain, e.g., the dividing ratio between training samples and vadilation samples, the number of convolutional kernel, the training learning rate, batchsize and epochs.
 
 (4) Since the limitation of sample space (e.g., the fixed number of channel samples is collected for each user), the inevitable overfitting phenomenon may occur in the network training stage with the increase of epochs
@@ -50,16 +48,12 @@ Specifically, you can run the “main.py” or "main_STN.py" file to train the h
 
 ## Acknowledgements
 
-In the hybrid-field channel modeling for XL-RIS systems, we refer to the channel modeling scheme in [1] for RIS-aided mmWave Massive MIMO systems (e.g., the path loss model and clustered scatters distribution), in which the far-field communication scenarios is extend to the hybrid-field communication by supplementing the near-field array response and VR cover vector. We are very grateful for the author of following reference paper and the open-source SimRIS Channel Simulator MATLAB package [2].
+(1) In the hybrid-field channel modeling for STAR-RIS systems, we refer to the channel modeling scheme in the following reference paper for RIS-aided mmWave Massive MIMO systems (e.g., the path loss model and clustered scatters distribution), in which the far-field communication scenarios is extend to the hybrid-field communication by supplementing the near-field array response and the VR cover vector. We are very grateful for the author of the following reference paper and the open-source SimRIS Channel Simulator MATLAB package.<br/>
+[1] E. Basar, I. Yildirim, and F. Kilinc, “Indoor and outdoor physical channel modeling and efficient positioning for reconfigurable intelligent surfaces in mmWave bands,” IEEE Trans. Commun., vol. 69, no. 12, pp. 8600-8611, Dec. 2021.<br/>
+[2] E. Basar, I. Yildirim, “Reconfigurable Intelligent Surfaces for Future Wireless Networks: A Channel Modeling Perspective“, IEEE Wireless Commun., vol. 28, no. 3, pp. 108–114, June 2021.<br/>
 
-[1] E. Basar, I. Yildirim, and F. Kilinc, “Indoor and outdoor physical channel modeling and efficient positioning for reconfigurable intelligent surfaces in mmWave bands,” IEEE Trans. Commun., vol. 69, no. 12, pp. 8600-8611, Dec. 2021.
-
-[2] E. Basar, I. Yildirim, “Reconfigurable Intelligent Surfaces for Future Wireless Networks: A Channel Modeling Perspective“, IEEE Wireless Commun., vol. 28, no. 3, pp. 108–114, June 2021.
+(2) We also appreciate the authors in the following reference paper to provide the open-source code for near-field ELAA channel estimation and STAR-RIS channel estimation, which are refered to the benchmarks in this work.<br/>
+[1] Y. Lu and L. Dai, “Near-field channel estimation in mixed LoS/NLoS environments for extremely large-scale MIMO systems,” IEEE Trans. Commun., vol. 71, no. 6, pp. 3694 - 3707, Jun. 2023.<br/>
+[2] C. Wu, C. You, Y. Liu, X. Gu, and Y. Cai, “Channel estimation for STAR-RIS-aided wireless communication,” IEEE Commun.Lett., vol. 26, no. 3, pp. 652–656, Mar. 2022.
 
 Copyright reserved by the WiCi Lab, Department of Electronics and Information Engineering, Central China Normal University, Wuhan 430079, China.
-
-## Preliminary version
-A preliminary version has been uploaded, while the clean code and the related instruction will be updated soon. We have provided the paired samples in the following link.
-
-[DOI Link: https://dx.doi.org/10.21227/3c2t-dz81
-](https://ieee-dataport.org/documents/star-risce)

@@ -13,6 +13,7 @@ In the following link, we have provided the paired samples for hybrid-field casc
 ](https://ieee-dataport.org/documents/star-risce)
 
 The simulation parameters of this dataset have been elaborated in our submitted paper. For instance, M_1 x M_2 = 4 x 8, N_1 x N_2 = 4 x 32, f_c = 73GHz, and Q=N/4.
+
 inHmix_28_32_128_K2_32pilot.mat: the training dataset and validation dataset in the ES protocol.<br/>
 inHmix_28_32_128_test_K2_32pilot.mat: the testing dataset in the ES protocol.<br/>
 inHmix_28_32_128_S_32pilot.mat: the training dataset and validation dataset in the TS protocol.<br/>

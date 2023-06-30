@@ -53,7 +53,7 @@ Specifically, you can run the “main.py” or "main_STN.py" file to train the h
 [2] E. Basar, I. Yildirim, “Reconfigurable Intelligent Surfaces for Future Wireless Networks: A Channel Modeling Perspective“, IEEE Wireless Commun., vol. 28, no. 3, pp. 108–114, June 2021.<br/>
 
 (2) We also appreciate the authors in the following reference paper to provide the open-source code for near-field ELAA channel estimation and STAR-RIS channel estimation, which are refered to the benchmarks in this work.<br/>
-[1] Y. Lu and L. Dai, “Near-field channel estimation in mixed LoS/NLoS environments for extremely large-scale MIMO systems,” IEEE Trans. Commun., vol. 71, no. 6, pp. 3694 - 3707, Jun. 2023.<br/>
-[2] C. Wu, C. You, Y. Liu, X. Gu, and Y. Cai, “Channel estimation for STAR-RIS-aided wireless communication,” IEEE Commun.Lett., vol. 26, no. 3, pp. 652–656, Mar. 2022.
+[3] Y. Lu and L. Dai, “Near-field channel estimation in mixed LoS/NLoS environments for extremely large-scale MIMO systems,” IEEE Trans. Commun., vol. 71, no. 6, pp. 3694 - 3707, Jun. 2023.<br/>
+[4] C. Wu, C. You, Y. Liu, X. Gu, and Y. Cai, “Channel estimation for STAR-RIS-aided wireless communication,” IEEE Commun.Lett., vol. 26, no. 3, pp. 652–656, Mar. 2022.
 
 Copyright reserved by the WiCi Lab, Department of Electronics and Information Engineering, Central China Normal University, Wuhan 430079, China.

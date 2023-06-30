@@ -38,66 +38,6 @@ class Mlp(nn.Module):
         x = self.drop(x)
         return x
 
-# MLP-based Permutator module
-class WeightedPermuteMLP(nn.Module):
-    def __init__(self, dim1, dim2, dim3, segment_dim=8, qkv_bias=False, qk_scale=None, attn_drop=0., proj_drop=0.):
-        super().__init__()
-        self.segment_dim = segment_dim
-
-        self.mlp_c = nn.Linear(dim1, dim1, bias=qkv_bias)
-        self.mlp_h = nn.Linear(dim2, dim2, bias=qkv_bias)
-        self.mlp_w = nn.Linear(dim3, dim3, bias=qkv_bias)
-
-        self.reweight = Mlp(dim1, dim1 // 2, dim1 *3)
-
-        self.proj = nn.Linear(dim1, dim1)
-        self.proj_drop = nn.Dropout(proj_drop)
-
-    def forward(self, x):
-        B, H, W, C = x.shape
-
-        S = C // self.segment_dim
-        h = x.reshape(B, H, W, self.segment_dim, S).permute(0, 3, 2, 1, 4).reshape(B, self.segment_dim, W, H*S)
-        h = self.mlp_h(h).reshape(B, self.segment_dim, W, H, S).permute(0, 3, 2, 1, 4).reshape(B, H, W, C)
-
-        w = x.reshape(B, H, W, self.segment_dim, S).permute(0, 1, 3, 2, 4).reshape(B, H, self.segment_dim, W*S)
-        w = self.mlp_w(w).reshape(B, H, self.segment_dim, W, S).permute(0, 1, 3, 2, 4).reshape(B, H, W, C)
-
-        c = self.mlp_c(x)
-
-        a = (h + w + c).permute(0, 3, 1, 2).flatten(2).mean(2)
-        a = self.reweight(a).reshape(B, C, 3).permute(2, 0, 1).softmax(dim=0).unsqueeze(2).unsqueeze(2)
-
-        x = h * a[0] + w * a[1] + c * a[2]
-
-        x = self.proj(x)
-        x = self.proj_drop(x)
-
-        return x
-
-# Complete Permutator block
-class PermutatorBlock(nn.Module):
-
-    def __init__(self, dim1, dim2, dim3, segment_dim, mlp_ratio=1., qkv_bias=False, qk_scale=None, drop=0., attn_drop=0.,
-                 drop_path=0., act_layer=False, norm_layer=nn.LayerNorm, skip_lam=1.0, mlp_fn = WeightedPermuteMLP):
-        super().__init__()
-        self.norm1 = norm_layer(dim1)
-        self.attn = mlp_fn(dim1, dim2, dim3, segment_dim=segment_dim, qkv_bias=qkv_bias, qk_scale=None, attn_drop=attn_drop)
-
-        # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
-        # self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
-
-        self.norm2 = norm_layer(dim1)
-        mlp_hidden_dim = int(dim1 * mlp_ratio)
-        self.mlp = Mlp(in_features=dim1, hidden_features=mlp_hidden_dim, act_layer=act_layer)
-        self.skip_lam = skip_lam
-
-    def forward(self, x):
-        x = x + self.attn(self.norm1(x)) / self.skip_lam
-        x = x + self.mlp(self.norm2(x)) / self.skip_lam
-        
-        return x
-
 # Convolutional module
 class conv_block1(nn.Module):
     """
@@ -153,6 +93,7 @@ class _Res_Block(nn.Module):
         y = torch.add(y, x)
         return y
 
+# Attention gating
 class Attention_block(nn.Module):
     def __init__(self,F_g,F_l,F_int):
         super(Attention_block,self).__init__()
@@ -166,39 +107,18 @@ class Attention_block(nn.Module):
             nn.BatchNorm2d(F_int)
         )
 
-        # self.psi = nn.Sequential(
-        #     nn.Conv2d(F_int, F_int, kernel_size=1,stride=1,padding=0,bias=True),
-        #     # nn.BatchNorm2d(F_int),
-        #     # nn.Sigmoid()
-        # )
-        
-        # self.relu = nn.LeakyReLU(negative_slope=0.3)
-        
-        # self.reweight = Mlp(F_g, F_g // 2, F_g *2)
+
         self.ca = SELayer(F_l)
         
     def forward(self,g,x):
-        g1 = self.W_g(g) #1x512x64x64->conv(512，256)/B.N.->1x256x64x64
-        x1 = self.W_x(x) #1x512x64x64->conv(512，256)/B.N.->1x256x64x64
+        g1 = self.W_g(g) 
+        x1 = self.W_x(x) 
         
         gx= g1+x1
-        # B, C, H, W = gx.shape
-        # # C= C//3
-        # a = gx
-        # a = a.flatten(2)
-        # a = a.mean(2)    
-        
-        # a = self.reweight(a)
-        # a = a.reshape(B, C, 2)
-        # a =a.permute(2, 0, 1)
-        # a = a.softmax(dim=0)
-        # a=a.unsqueeze(3)
-        # a=a.unsqueeze(4)
-        
-        # psi = g * a[0] + x * a[1]#1x256x64x64
-        psi = self.ca(gx)#得到权重矩阵  1x256x64x64 -> 1x1x64x64 ->sigmoid 结果到（0，1）
 
-        return x+psi #与low-level feature相乘，将权重矩阵赋值进去       
+        psi = self.ca(gx)
+
+        return x+psi     
 
 class Scale(nn.Module):
 
@@ -209,6 +129,7 @@ class Scale(nn.Module):
     def forward(self, input):
         return input * self.scale
 
+# Axial MLP module
 class MLPBlock(nn.Module):
     def __init__(self,h=224,w=224,c=3):
         super().__init__()
@@ -217,9 +138,6 @@ class MLPBlock(nn.Module):
         self.fuse=nn.Linear(3*c,c)
         self.instan = nn.BatchNorm2d(c)
         
-        # self.weight1 = Scale(1)
-        # self.weight2 = Scale(1)
-        # self.weight3 = Scale(1)
     
     def forward(self,x):
         x1=x
@@ -233,7 +151,7 @@ class MLPBlock(nn.Module):
     
 from torch.nn.utils import weight_norm
     
-
+# Channel Attention module
 class SELayer(nn.Module):
     def __init__(self, channel, reduction=4):
         super(SELayer, self).__init__()
@@ -242,12 +160,11 @@ class SELayer(nn.Module):
         # Excitation
         self.fc = nn.Sequential(
             nn.Linear(channel, channel // reduction, bias=True),
-            # nn.LeakyReLU(negative_slope=0.2),
-            nn.ReLU(),
-            
+            nn.LeakyReLU(negative_slope=0.2),
+            # nn.ReLU(),
             nn.Linear(channel // reduction, channel, bias=True),
-            nn.Sigmoid()
-            # nn.Tanh()
+            # nn.Sigmoid()
+            nn.Tanh()
         )
 
     def forward(self, x):
@@ -255,7 +172,8 @@ class SELayer(nn.Module):
         y = self.avg_pool(x).view(b, c)
         y = self.fc(y).view(b, c, 1, 1)
         return x * y.expand_as(x)
-    
+
+# Dynamic Convolution
 class DynamicDWConv(nn.Module):
     def __init__(self, dim, kernel_size, bias=True, stride=1, padding=1, groups=1, reduction=4):
         super().__init__()
@@ -282,18 +200,15 @@ class DynamicDWConv(nn.Module):
         x = F.conv2d(x.reshape(1, -1, h, w), weight, self.bias.repeat(b), stride=self.stride, padding=self.padding, groups=b * self.groups)
         x = x.view(b, c, x.shape[-2], x.shape[-1])
         return x
-    
+
+# Channel-wise Convolution    
 class _Res_Blocka(nn.Module):
     def __init__(self, dadis, in_ch, out_ch):
         super(_Res_Blocka, self).__init__()
-        # window_size=3
         self.res_conv = nn.Conv2d(in_ch, out_ch, kernel_size=3, padding=dadis, groups=out_ch//8,dilation=dadis)
-        # self.res_conb = nn.Conv2d(out_ch, out_ch, kernel_size=3, padding=1, groups=4,dilation=1)
-        
-        # self.res_conv = DWBlock(in_ch, window_size)
+
 
         self.res_cona = nn.Conv2d(out_ch, out_ch, kernel_size=1)
-        # self.res_cona1 = nn.Conv2d(out_ch, out_ch*2, kernel_size=1)
         
         self.relu = nn.LeakyReLU(negative_slope=0.3)
         
@@ -303,73 +218,22 @@ class _Res_Blocka(nn.Module):
     def forward(self, x,al=1):
         x1 = self.instan(x)
         
-        # y = self.res_conv(self.relu(self.res_cona1(x1)))
         y = self.relu(self.res_conv(x1))
         y = self.relu(self.res_cona(y))
         y = self.ca(y)
         y *= al
         y = torch.add(y, x)
         return y
-    
-class DWBlock(nn.Module):
 
-    def __init__(self, dim, window_size, dynamic=False, inhomogeneous=False, heads=None):
-        super().__init__()
-        self.dim = dim
-        self.window_size = window_size  # Wh, Ww
-        self.dynamic = dynamic 
-        self.inhomogeneous = inhomogeneous
-        self.heads = heads
-        
-        # pw-linear
-        self.conv0 = nn.Conv2d(dim, dim, 1, bias=False)
-        self.bn0 = nn.BatchNorm2d(dim)
-        
-        if dynamic and not inhomogeneous:
-            self.conv = DynamicDWConv(dim, kernel_size=window_size, stride=1, padding=window_size // 2, groups=dim)
-        else :
-            self.conv = nn.Conv2d(dim, dim, kernel_size=window_size, stride=1, padding=window_size // 2, groups=dim)
-        
-        self.bn = nn.BatchNorm2d(dim)
-        self.relu=nn.ReLU(inplace=True)
-                
-        # pw-linear
-        self.conv2=nn.Conv2d(dim, dim, 1, bias=False)
-        self.bn2 = nn.BatchNorm2d(dim)
-
-    def forward(self, x):
-        B, H, W, C = x.shape
-        
-        # x = x.permute(0, 3, 1, 2).contiguous()
-        x = self.conv0(x)
-        x = self.bn0(x)
-        x = self.relu(x)
-        
-        x = self.conv(x)
-        x=self.bn(x)
-        x=self.relu(x)
-        
-        x = self.conv2(x)
-        x=self.bn2(x)
-        
-        # x = x.permute(0, 2, 3, 1).contiguous()
-        return x
-    
+# ConvMLP module    
 class sMLPBlock(nn.Module):
     def __init__(self,dadis=1,h=224,w=224,c=3):
         super().__init__()
         self.dw=_Res_Blocka(dadis,c,c)
         self.mlp=MLPBlock(h,w,c)
         self.cmlp = Mlp(in_features=c, hidden_features=c*2)
-        # self.fuse=nn.Linear(3*c,c)
-        
-        # self.weight1 = Scale(1)
-        # self.weight2 = Scale(1)
-        # self.weight3 = Scale(1)
-        # self.weight4 = Scale(1)
     
     def forward(self,x):
-        # x1=x
         x= self.dw(x)
         x= self.mlp(x)
         x = rearrange(x, 'b c h w -> b h w c')
@@ -403,26 +267,12 @@ class channel_est(nn.Module):
         self.Up22 = conv_block1(filters[1], filters[0],1,1,1)
         self.Conv = nn.Conv2d(filters[0], out_ch, kernel_size=3, stride=1, padding=1)
         
-        # self.UpS4 = up_conv(filters[1], filters[0])
-        # self.UpS41 = conv_block1(filters[1], filters[0],1,1,1)
-        # self.ConvS4 = nn.Conv2d(filters[0], out_ch, kernel_size=3, stride=1, padding=1)
-        
-        # seg_dim1 = 24
-        # seg1 = filters[1]//seg_dim1
-        
-        # seg_dim33 = 24
-        # seg33 = filters[2]//seg_dim33
-        
-        # seg_dim2 = 4
-        # seg2 = filters[0]//seg_dim2
         
         self.mlp_mixerE1 = sMLPBlock(dadis=2,h=32,w=128,c=filters[0])
         self.mlp_mixerE2 = sMLPBlock(dadis=1, h=16,w=64,c=filters[1])
         self.mlp_mixerE3 = sMLPBlock(dadis=1,h=8,w=32,c=filters[2])
         
         # self.weight1 = SELayer(filters[1])
-        # self.weight2 = SELayer(filters[0])
-        # self.weight3 = SELayer(filters[0])
         
         self.mlp_mixerS1 = sMLPBlock(dadis=1,h=16,w=64,c=filters[1])
         self.mlp_mixerS11 = sMLPBlock(dadis=2,h=32,w=128,c=filters[0])
@@ -435,20 +285,14 @@ class channel_est(nn.Module):
         
         ###### Encoding
         e1 = self.Conv11(x) 
-        # e1 = rearrange(e1, 'b c h w -> b h w c')
         e1 = self.mlp_mixerE1(e1)
-        # e1 = rearrange(e1, 'b h w c-> b c h w')
 
         e2 = self.Conv22(e1)
-        # e2 = rearrange(e2, 'b c h w -> b h w c')
         e2 = self.mlp_mixerE2(e2)
-        # e2 = rearrange(e2, 'b h w c-> b c h w')
         
         
         e3 = self.Conv33(e2)
-        # e3 = rearrange(e3, 'b c h w -> b h w c')
         e3 = self.mlp_mixerE3(e3)
-        # e3 = rearrange(e3, 'b h w c-> b c h w')
         
         ####### Subtask 1
         d3 = self.Up3(e3)
@@ -457,9 +301,7 @@ class channel_est(nn.Module):
         
         d3 = torch.cat((e2, d3), dim=1)
         d3 = self.Up33(d3)
-        # d3 = rearrange(d3, 'b c h w -> b h w c')
         d3 = self.mlp_mixerS1(d3)
-        # d3 = rearrange(d3, 'b h w c-> b c h w')
         
 
         d22 = self.Up2(d3) 
@@ -468,9 +310,7 @@ class channel_est(nn.Module):
         
         d22 = torch.cat((e1, d22), dim=1)
         d22 = self.Up22(d22)
-        # d22 = rearrange(d22, 'b c h w -> b h w c')
         d22 = self.mlp_mixerS11(d22)
-        # d22 = rearrange(d22, 'b h w c-> b c h w')
         
         out1 = self.Conv(d22)
         

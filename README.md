@@ -13,10 +13,11 @@ In the following link, we have provided the paired samples for hybrid-field casc
 ](https://ieee-dataport.org/documents/star-risce)
 
 The simulation parameters of this dataset have been elaborated in our submitted paper. For instance, M_1 x M_2 = 4 x 8, N_1 x N_2 = 4 x 32, f_c = 73GHz, and Q=N/4.
-
-You can download the dataset and put it in the desired folder. The “inHmix_28_32_128_K2_32pilot.mat” file collect the training dataset and validation dataset, while the “inHmix_28_32_128_test_K2_32pilot.mat” file is the testing dataset.
-
-In the training and validation dataset generation, a common set of XL-RIS links is used for cascaded channel samples. However, in the test dataset, we replace a new set of XL-RIS links for each sample realization, which supports the network generalization in the test stage.
+inHmix_28_32_128_K2_32pilot.mat: the training dataset and validation dataset in the ES protocol.<br/>
+inHmix_28_32_128_test_K2_32pilot.mat: the testing dataset in the ES protocol.<br/>
+inHmix_28_32_128_S_32pilot.mat: the training dataset and validation dataset in the TS protocol.<br/>
+inHmix_28_32_128_test_S_32pilot.mat: the testing dataset in the TS protocol.<br/>
+please download the dataset and put it in the desired folder. 
 
 ### 2. Training and Testing of LPAN/LPAN-L model
 

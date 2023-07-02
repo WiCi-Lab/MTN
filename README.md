@@ -17,7 +17,7 @@ inHmix_28_32_128_K2_32pilot.mat: the training dataset and validation dataset in 
 inHmix_28_32_128_test_K2_32pilot.mat: the testing dataset in the ES protocol.<br/>
 inHmix_28_32_128_S_32pilot.mat: the training dataset and validation dataset in the TS protocol.<br/>
 inHmix_28_32_128_test_S_32pilot.mat: the testing dataset in the TS protocol.<br/>
-please download the dataset and put it in the desired folder. 
+please download the dataset and put it in the desired folder, in which the dataset in the TS protocol is prepared for the STN model.
 
 ### 2. Training and Testing of LPAN/LPAN-L model
 

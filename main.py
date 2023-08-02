@@ -259,7 +259,7 @@ for it in range(epochs):
         epoch_cost = epoch_cost + (loss / BATCH_SIZE)
         
         
-    costtr.append(torch.mean(epoch_cost))
+    costtr.append(epoch_cost/len(train_loader))
 
     print('Iter-{}; Total loss: {:.4}'.format(it, loss.item()))
     
@@ -296,9 +296,9 @@ for it in range(epochs):
             
         nm1.append(np.mean(tr_nmse1))
         nm2.append(np.mean(tr_nmse2))
-        cost1D.append(torch.mean(epoch_cost1))
-        cost2D.append(torch.mean(epoch_cost2))
-        costD.append(torch.mean(epoch_cost)) 
+        cost1D.append(epoch_cost1/len(val_loader))
+        cost2D.append(epoch_cost1/len(val_loader))
+        costD.append(epoch_cost1/len(val_loader)) 
 
         print('Iter-{}; NMSE_R1: {:.4}'.format(it, 10*np.log10(np.mean(tr_nmse1))))
         print('Iter-{}; NMSE_R2: {:.4}'.format(it, 10*np.log10(np.mean(tr_nmse2))))

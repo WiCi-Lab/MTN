@@ -178,7 +178,7 @@ cost2ts = []
 costtr = []
 costD = []
 costts = []
-tr_nmse1 = []
+
 tr_nmse2 = []
 tr_nmse3 = []
 tr_nmse4 = []
@@ -218,13 +218,13 @@ for it in range(epochs):
         
         epoch_cost = epoch_cost + (loss / BATCH_SIZE)
         
-    costtr.append(torch.mean(epoch_cost))
+    costtr.append(epoch_cost/len(train_loader))
 
     print('Iter-{}; Total loss: {:.4}'.format(it, loss.item()))
 
     with torch.no_grad():
         model.eval()
-        
+        tr_nmse1 = []
         for i, (x1, x2, y1, y2) in enumerate(val_loader):
             XE1, XE2, YE1, YE2= x1.to(device), x2.to(device), y1.to(device), y2.to(device)
             
@@ -248,7 +248,7 @@ for it in range(epochs):
             tr_nmse1.append(np.mean(nmsei1))
             
         nm1.append(np.mean(tr_nmse1))
-        cost1D.append(torch.mean(epoch_cost1))
+        cost1D.append(epoch_cost1/len(val_loader))
 
         print('Iter-{}; NMSE_R1: {:.4}'.format(it, 10*np.log10(np.mean(tr_nmse1))))
         

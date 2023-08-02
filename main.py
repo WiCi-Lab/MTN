@@ -218,8 +218,6 @@ cost2ts = []
 costtr = []
 costD = []
 costts = []
-tr_nmse1 = []
-tr_nmse2 = []
 tr_nmse3 = []
 tr_nmse4 = []
 nm1=[]
@@ -268,8 +266,9 @@ for it in range(epochs):
     # Model vadilation
     with torch.no_grad():
         model.eval()
-        
-        # in this code, we directly use the test data as the vadilation data. In fact, in the training 
+        tr_nmse1 = []
+        tr_nmse2 = []
+         
         for i, (x, y1,y2) in enumerate(val_loader):
             XE, YE1, YE2 = x.to(device), y1.to(device), y2.to(device)
             

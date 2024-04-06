@@ -6,6 +6,9 @@ This work has been submitted for possible publication. We highly respect reprodu
 ## Usage
 How to use this simulation code package?
 
+### Updating 2024.04.06
+
+
 ### 1.Data Generation and Download
 
 In the following link, we have provided the paired samples for hybrid-field cascaded channel estimation in STAR-RIS systems, in which the data preprocessing and normalization operations have been completed.

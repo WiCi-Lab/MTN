@@ -187,7 +187,7 @@ class MyDataset1(Dataset):
         return (x, y1, y2)
 
 # Training hyper-parameter
-BATCH_SIZE=32
+BATCH_SIZE=16
 train_dataset = MyDataset()
 train_loader = DataLoader(dataset=train_dataset,
                             batch_size=BATCH_SIZE,
@@ -205,7 +205,12 @@ test_loader = DataLoader(dataset=test_dataset,
                             shuffle=False,drop_last=True) 
 
 mtl = MultiTaskLossWrapper(2, model)
+# if use L1 loss for the subtask loss function
 loss_func = nn.L1Loss().to(device)
+# else if use L2 loss
+# loss_func = nn.MSELoss().to(device)
+
+
 optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9, weight_decay=5e-4,nesterov=True)
 
 epochs = 50 
@@ -218,6 +223,8 @@ cost2ts = []
 costtr = []
 costD = []
 costts = []
+tr_nmse1 = []
+tr_nmse2 = []
 tr_nmse3 = []
 tr_nmse4 = []
 nm1=[]
@@ -232,7 +239,11 @@ def adjust_learning_rate(optimizer, epoch,learning_rate_init,learning_rate_final
 
 # Training loops
 for it in range(epochs):
+    # if use L1 loss
     lr = adjust_learning_rate(optimizer, it,1e-1,1e-5)
+    # else if use L2 loss, the smaller learning rate should be used to avoid the gradient explosion
+    # lr = adjust_learning_rate(optimizer, it,5e-2,1e-5)
+    
     model.train()
     epoch_cost = 0
     epoch_cost1 = 0
@@ -259,16 +270,15 @@ for it in range(epochs):
         epoch_cost = epoch_cost + (loss / BATCH_SIZE)
         
         
-    costtr.append(epoch_cost/len(train_loader))
+    costtr.append(torch.mean(epoch_cost))
 
     print('Iter-{}; Total loss: {:.4}'.format(it, loss.item()))
     
     # Model vadilation
     with torch.no_grad():
         model.eval()
-        tr_nmse1 = []
-        tr_nmse2 = []
-         
+        
+        # in this code, we directly use the test data as the vadilation data. In fact, in the training 
         for i, (x, y1,y2) in enumerate(val_loader):
             XE, YE1, YE2 = x.to(device), y1.to(device), y2.to(device)
             
@@ -296,9 +306,9 @@ for it in range(epochs):
             
         nm1.append(np.mean(tr_nmse1))
         nm2.append(np.mean(tr_nmse2))
-        cost1D.append(epoch_cost1/len(val_loader))
-        cost2D.append(epoch_cost1/len(val_loader))
-        costD.append(epoch_cost1/len(val_loader)) 
+        cost1D.append(torch.mean(epoch_cost1))
+        cost2D.append(torch.mean(epoch_cost2))
+        costD.append(torch.mean(epoch_cost)) 
 
         print('Iter-{}; NMSE_R1: {:.4}'.format(it, 10*np.log10(np.mean(tr_nmse1))))
         print('Iter-{}; NMSE_R2: {:.4}'.format(it, 10*np.log10(np.mean(tr_nmse2))))

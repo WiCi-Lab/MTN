@@ -9,6 +9,7 @@ How to use this simulation code package?
 ### Updating 2024.04.06
 
 According to the insightful comments, based on the proposed baseline model, we have provided multiple MTN variants to further improve the existing ablation experiments. 
+
 In the updated file of MTN.py, we have added two MTN variants with the larger network scale to deal with the case of $K=4$ users within a user group. 
 
 In the file of MTN_R1.py, we have provided a MTN variant based on feature tensor summation operations to compare the network performance under different feature fusion methods. 

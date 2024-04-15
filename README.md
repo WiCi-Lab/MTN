@@ -6,7 +6,7 @@ This work has been submitted for possible publication. We highly respect reprodu
 ## Usage
 How to use this simulation code package?
 
-### Updating 2024.04.06
+### Updating 2024.04.10
 
 According to the insightful comments, based on the proposed baseline model, we have provided multiple MTN variants to further improve the existing ablation experiments.<br/>
 * In the updated file of MTN.py, we have added two MTN variants with the larger network scale to deal with the case of $K=4$ users within a user group.<br/>

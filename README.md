@@ -20,23 +20,23 @@ DOI Link: https://dx.doi.org/10.21227/5v5m-wd56
 
 The simulation parameters of this dataset have been elaborated in our submitted paper. For instance, M_1 x M_2 = 4 x 8, N_1 x N_2 = 4 x 32, f_c = 28GHz, and Q=N/4.  The  description of each data file is listed as follows.
 
-inHmix_28_32_128_K2_32pilot.mat: the training dataset and validation dataset in the ES protocol.<br/>
-inHmix_28_32_128_test_K2_32pilot.mat: the testing dataset in the ES protocol.<br/>
-inHmix_28_32_128_S_32pilot.mat: the training dataset and validation dataset in the TS protocol.<br/>
-inHmix_28_32_128_test_S_32pilot.mat: the testing dataset in the TS protocol.<br/>
+* inHmix_28_32_128_K2_32pilot.mat: the training dataset and validation dataset in the ES protocol.<br/>
+* inHmix_28_32_128_test_K2_32pilot.mat: the testing dataset in the ES protocol.<br/>
+* inHmix_28_32_128_S_32pilot.mat: the training dataset and validation dataset in the TS protocol.<br/>
+* inHmix_28_32_128_test_S_32pilot.mat: the testing dataset in the TS protocol.<br/>
 please download the dataset and put it in the desired folder, in which the dataset in the TS protocol is prepared for the STN model.
 
 ### 2. Training and Testing of MTN/STN model
 
 We have provided the model training and test code to reproduce the corresponding results of this submitted paper. The deatailed description of each script is listed as follows.
 
-main.py: the main function of the MTN model.<br/>
-main_STN.py: the main function of the STN model.<br/>
-MTN.py: the proposed multi-task network architecture.<br/>
-STN.py: the proposed single-task network architecture.<br/>
-MDSR.py: a baseline network architecture based on the MDSR model.<br/>
-DRSN.py: a baseline network architecture based on the DRSN model.<br/>
-Benchmarks.py: A preliminary version based on the Transformer model.<br/>
+* main.py: the main function of the MTN model.<br/>
+* main_STN.py: the main function of the STN model.<br/>
+* MTN.py: the proposed multi-task network architecture.<br/>
+* STN.py: the proposed single-task network architecture.<br/>
+* MDSR.py: a baseline network architecture based on the MDSR model.<br/>
+* DRSN.py: a baseline network architecture based on the DRSN model.<br/>
+* Benchmarks.py: A preliminary version based on the Transformer model.<br/>
 
 Specifically, you can run the “main.py” or "main_STN.py" file to train the hybrid-field cascaded channel estimation network, and then test the channel estimation performance under different SNR conditions, in which the model training and test code have been integrated into the main function. To enhance the readability of the provided scripts, We also have added the necessary code annotation.
 

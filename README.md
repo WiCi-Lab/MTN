@@ -54,7 +54,7 @@ Specifically, you can run the “main.py” or "main_STN.py" file to train the h
 
 ## Acknowledgements
 
-(1) In the hybrid-field channel modeling for STAR-RIS systems, we refer to the channel modeling scheme in the following reference paper for RIS-aided mmWave Massive MIMO systems (e.g., the path loss model and clustered scatters distribution), in which the far-field communication scenarios is extend to the hybrid-field communication by supplementing the near-field array response and the VR cover vector. We are very grateful for the author of the following reference paper and the open-source SimRIS Channel Simulator MATLAB package.<br/>
+(1) In the hybrid-field channel modeling for STAR-RIS systems, we refer to the channel modeling scheme in the following reference paper for RIS-aided mmWave Massive MIMO systems (e.g., the path loss model and clustered scatters distribution), in which the far-field communication scenarios is extend to the hybrid-field communication by supplementing the near-field array response and the VR cover vector. We are very grateful for the authors of the following reference papers and the open-source SimRIS Channel Simulator MATLAB package.<br/>
 [1] E. Basar, I. Yildirim, and F. Kilinc, “Indoor and outdoor physical channel modeling and efficient positioning for reconfigurable intelligent surfaces in mmWave bands,” IEEE Trans. Commun., vol. 69, no. 12, pp. 8600-8611, Dec. 2021.<br/>
 [2] E. Basar, I. Yildirim, “Reconfigurable Intelligent Surfaces for Future Wireless Networks: A Channel Modeling Perspective“, IEEE Wireless Commun., vol. 28, no. 3, pp. 108–114, June 2021.<br/>
 

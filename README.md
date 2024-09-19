@@ -1,4 +1,4 @@
-# Multi-Task Learning Based Joint Channel Estimation for Hybrid-Field STAR-RIS Systems
+# Multi-Task Learning for Channel Estimation in Hybrid-Field STAR-RIS Networks
 Authors: Jian Xiao, Ji Wang, Zhaolin Wang, Jun Wang, Wenwu Xie, and Yuanwei Liu.
 
 This work has been submitted for possible publication. We highly respect reproducible research, so we try to provide the simulation codes for our submitted papers.
